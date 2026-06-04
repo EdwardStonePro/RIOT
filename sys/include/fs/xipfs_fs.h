@@ -33,6 +33,44 @@ extern "C" {
 #endif
 
 /**
+ * @def XIPFS_PARTITION_CORE
+ *
+ * @brief Define an XiPFS mountpoint along with its associated
+ * metadata
+ *
+ * @param id Identifier name for the mount point used by
+ * functions that manipulate xipfs file systems
+ *
+ * @param path The mount point of the file system in the VFS tree
+ *
+ * @param data Pointer to the start of the mount point in Flash
+ * memory.
+ *
+ * @param data_bytesize Size of the mount point in Flash memory.
+ *
+ * @warning data_bytesize must be an integral multiple of
+ * XIPFS_NVM_PAGE_SIZE.
+ *
+ * @see XIPFS_NEW_PARTITION
+ * @see XIPFS_START_PARTITION_INCLUSION / XIPFS_END_PARTITION_INCLUSION
+ */
+#define XIPFS_PARTITION_CORE(id, path, data, data_bytesize) \
+    static mutex_t execution_mutex_##id = MUTEX_INIT;       \
+    static mutex_t mutex_##id = MUTEX_INIT;                 \
+    static vfs_xipfs_mount_t id = {                         \
+        .vfs_mp = {                                         \
+            .fs = &xipfs_file_system,                       \
+            .mount_point = path,                            \
+        },                                                  \
+        .magic = XIPFS_MAGIC,                               \
+        .mount_path = path,                                 \
+        .page_num = data_bytesize / XIPFS_NVM_PAGE_SIZE,    \
+        .page_addr = (void *)data,                          \
+        .execution_mutex = &execution_mutex_##id,           \
+        .mutex = &mutex_##id                                \
+    }
+
+/**
  * @def XIPFS_NEW_PARTITION
  *
  * @brief Allocate a new contiguous space aligned to a page in
@@ -47,22 +85,48 @@ extern "C" {
  * @param num The total number of pages allocated for the
  * partition
  */
-#define XIPFS_NEW_PARTITION(id, path, num)            \
-    FLASH_WRITABLE_INIT(xipfs_part_##id, num);        \
-    static mutex_t execution_mutex_##id = MUTEX_INIT; \
-    static mutex_t mutex_##id = MUTEX_INIT;           \
-    static vfs_xipfs_mount_t id = {                   \
-        .vfs_mp = {                                   \
-            .fs = &xipfs_file_system,                 \
-            .mount_point = path,                      \
-        },                                            \
-        .magic = XIPFS_MAGIC,                         \
-        .mount_path = path,                           \
-        .page_num = num,                              \
-        .page_addr = (void *)xipfs_part_##id,         \
-        .execution_mutex = &execution_mutex_##id,     \
-        .mutex = &mutex_##id                          \
-    }
+#define XIPFS_NEW_PARTITION(id, path, num)                                      \
+    FLASH_WRITABLE_INIT(xipfs_part_##id, num);                                  \
+    XIPFS_PARTITION_CORE(id, path, xipfs_part_##id, num * XIPFS_NVM_PAGE_SIZE)
+
+/**
+ * @def XIPFS_START_PARTITION_INCLUSION
+ *
+ * @brief Define the beginning of an included XiPFS mount point.
+ *
+ * @param id Identifier name for the mount point used by
+ * functions that manipulate xipfs file systems
+ *
+ * @remarks This macro should be used together with XIPFS_END_PARTITION_INCLUSION
+ * to define an XiPFS mount point inclusion.
+ *
+ * @warning Contrary to most other macros, please take care NOT to end this one
+ * with a semicolon character ';'.
+ */
+#define XIPFS_START_PARTITION_INCLUSION(id)         \
+    __attribute__((aligned(XIPFS_NVM_PAGE_SIZE)))   \
+    __attribute__((section(".rodata.xipfs." #id)))
+
+/**
+ * @def XIPFS_END_PARTITION_INCLUSION
+ *
+ * @brief Define the end of an included XiPFS mount point.
+ *
+ * @param id Identifier name for the mount point used by
+ * functions that manipulate xipfs file systems
+ *
+ * @param path The mount point of the file system in the VFS tree
+ *
+ * @param data Pointer to the start of the mount point in Flash
+ * memory.
+ *
+ * @param data_bytesize Size of the mount point in Flash memory.
+ *
+ * @remarks This macro should be used together with XIPFS_END_PARTITION_INCLUSION
+ * to define a mount point inclusion.
+ */
+#define XIPFS_END_PARTITION_INCLUSION(id, path, data, data_bytesize) \
+    XIPFS_PARTITION_CORE(id, path, data, data_bytesize)
 
 /**
  * @brief xipfs descriptor for vfs integration

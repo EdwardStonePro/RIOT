@@ -108,7 +108,7 @@ static void test_xipfs_open_ok(void);
 static void test_xipfs_read_ebadf_descp(void);
 static void test_xipfs_read_efault_dest(void);
 static void test_xipfs_read_eacces_flags(void);
-static void test_xipfs_read_eio_empty_file(void);
+static void test_xipfs_read_ok_empty_file(void);
 static void test_xipfs_write_ebadf_descp(void);
 static void test_xipfs_write_efault_src(void);
 static void test_xipfs_write_eacces_flags(void);
@@ -305,7 +305,7 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     test_xipfs_read_ebadf_descp();
     test_xipfs_read_efault_dest();
     test_xipfs_read_eacces_flags();
-    test_xipfs_read_eio_empty_file();
+    test_xipfs_read_ok_empty_file();
 
     /* xipfs_write */
     test_xipfs_write_ebadf_descp();
@@ -584,12 +584,6 @@ static void test_xipfs_mountpoint_invalid_cases(test_xipfs_mountpoint_callback_t
         }
         /* Empty string */
         mp.mount_path = "";
-        {
-            int ret = callback(&mp);
-            XIPFS_ASSERT(ret == -EINVAL);
-        }
-        /* Root */
-        mp.mount_path = "/";
         {
             int ret = callback(&mp);
             XIPFS_ASSERT(ret == -EINVAL);
@@ -1603,7 +1597,7 @@ static void test_xipfs_read_eacces_flags(void)
     XIPFS_ASSERT(ret == 0);
 }
 
-static void test_xipfs_read_eio_empty_file(void)
+static void test_xipfs_read_ok_empty_file(void)
 {
     xipfs_file_desc_t desc;
     char buf;
@@ -1616,7 +1610,7 @@ static void test_xipfs_read_eio_empty_file(void)
 
     /* test */
     ret = xipfs_read(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    XIPFS_ASSERT(ret == -EIO);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
@@ -1983,7 +1977,7 @@ static void test_xipfs_write_last_page_of_filesystem(void)
      * Try to write one more byte into the file.
      */
     bytes_count = xipfs_write(xipfs_nvme0p0, &desc, write_pattern, 1);
-    XIPFS_ASSERT(bytes_count == -EDQUOT);
+    XIPFS_ASSERT(bytes_count == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
     XIPFS_ASSERT(ret == 0);

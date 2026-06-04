@@ -482,7 +482,7 @@ static int _unlink(vfs_mount_t *vfs_mp, const char *name)
     mutex_lock(mp->mutex);
     ret = xipfs_unlink(mp, name);
     mutex_unlock(mp->mutex);
-    mutex_lock(mp->execution_mutex);
+    mutex_unlock(mp->execution_mutex);
 
     return ret;
 }
