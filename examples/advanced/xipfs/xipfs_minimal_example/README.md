@@ -1,51 +1,61 @@
-# XiPFS minimal example.
+# XiPFS minimal example
 
 ## About
-This example demonstrates how to :
-- declare 2 XiPFS mountpoints, `nvme0p0` and `nvme0p1`, located in flash memory (`.flash_writable` section),
+This example demonstrates how to:
+- declare 2 XiPFS mountpoints, `nvme0p0` and `nvme0p1`,
+  both located in flash memory (`.flash_writable` section),
 - mount them at runtime,
 - populate one of them with embedded executable files,
 - execute files with and without memory protection from `shell`.
 
-XiPFS should be compatible with ARM 32 bits platforms having an ARMv7-M Memory Protection Unit;
-but for now, only the Qorvo `DWM1001` board has been tested and is confirmed to function correctly.
+XiPFS should be compatible with ARM 32 bits platforms having an ARMv7-M Memory
+Protection Unit; but for now, only the Qorvo `DWM1001` board has been tested
+and is confirmed to function correctly.
 
-## FAE files.
-[FAE format](https://github.com/2xs/fae_format/tree/master) is a custom lightweight binary executable format dedicated to the deployment of post-issuance software in constrained devices.
+## FAE files
+[FAE format](https://github.com/2xs/fae_format/tree/master) is a custom
+lightweight binary executable format dedicated to the deployment of
+post-issuance software in constrained devices.
 
-Two FAE files have been crafted and are provided for demonstration purposes :
+Two FAE files have been crafted and are provided for demonstration purposes:
 
 - `hello-world.fae`, which prints the traditional "Hello World!" message and displays the current temperature.
-Source code is available in the folder [01-main](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/01-main) of XiPFS demonstrations.
+Source code is available in the folder [01-main](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/01-main)
+ of XiPFS demonstrations.
 - `dumper.fae`, which attempts to display to standard output memory contents from RAM or flash memory.
-Source code is available in the folder [18-memory_hexdump](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/18-memory_hexdump) of XiPFS demonstrations.
+Source code is available in the folder [18-memory_hexdump](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/18-memory_hexdump)
+ of XiPFS demonstrations.
 
-To reproduce these files or to create your own, please start by cloning the `master` branch of [FAE format repository](https://github.com/2xs/fae_format/tree/master).
-Then, read the associated [README.md](https://github.com/2xs/fae_format/blob/master/README.md) and [GETTING_STARTED.md](https://github.com/2xs/fae_format/blob/master/GETTING_STARTED.md) documents
-to setup your build environment.
+To reproduce these files or to create your own, please start by cloning
+the `master` branch of [FAE format repository](https://github.com/2xs/fae_format/tree/master).
 
-Finally, clone the `master` branch of [XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master) and follow the [README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
+Then, read the associated [README.md](https://github.com/2xs/fae_format/blob/master/README.md)
+ and [GETTING_STARTED.md](https://github.com/2xs/fae_format/blob/master/GETTING_STARTED.md)
+ documents to setup your build environment.
 
-## RIOT example usage.
-Given the target board being Qorvo's `dwm1001` :
+Finally, clone the `master` branch of [XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master)
+ and follow the [README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
 
-- Fire `pyterm` in a terminal.
+## RIOT example usage
+Given the target board being Qorvo's `dwm1001`:
 
-```
-$ cd RIOT/examples/advanced/xipfs/xipfs_minimal_example
-$ BOARD=dwm1001 QUIET=0 make term
+- Open e.g. `pyterm` in a terminal with `make term`.
+
+```shell
+cd RIOT/examples/advanced/xipfs/xipfs_minimal_example
+BOARD=dwm1001 QUIET=0 make term
 ```
 
 - Build the example and flash the board in **another terminal**.
 
-```
-$ cd RIOT/examples/advanced/xipfs/xipfs_minimal_example
-$ BOARD=dwm1001 QUIET=0 make flash
+```shell
+cd RIOT/examples/advanced/xipfs/xipfs_minimal_example
+BOARD=dwm1001 QUIET=0 make flash
 ```
 
 - Observe the welcome message and mountpoints log in `pyterm` terminal.
 
-```
+```shell
 # main(): This is RIOT!
 # vfs_mount: "/nvme0p0": OK
 # vfs_mount: "/nvme0p1": OK
@@ -53,7 +63,7 @@ $ BOARD=dwm1001 QUIET=0 make flash
 
 - Inspect the two empty mountpoints.
 
-```
+```shell
 > vfs ls /nvme0p0
 # vfs ls /nvme0p0
 # total 0 files
@@ -62,9 +72,10 @@ $ BOARD=dwm1001 QUIET=0 make flash
 # total 0 files
 ```
 
-- Drop files into the first partition thanks to the special example command `drop_files`.
+- Drop files into the first partition thanks to the special example
+ command `drop_files`.
 
-```
+```shell
 > drop_files
 # drop_files
 > vfs ls /nvme0p0
@@ -76,7 +87,7 @@ $ BOARD=dwm1001 QUIET=0 make flash
 
 - Execute `hello-world.fae` file without memory protection.
 
-```
+```shell
 > execute /nvme0p0/hello-world.fae
 # execute /nvme0p0/hello-world.fae
 # Hello World!
@@ -85,7 +96,7 @@ $ BOARD=dwm1001 QUIET=0 make flash
 
 - Execute `dumper.fae` without memory protection.
 
-```
+```shell
 > execute /nvme0p0/dumper.fae legit-ram
 # execute /nvme0p0/dumper.fae legit-ram
 # 20003050  f0 24 00 20 a8 66 00 20   00 30 00 20 00 00 00 00  |.$. .f. .0. ....|
@@ -119,11 +130,12 @@ $ BOARD=dwm1001 QUIET=0 make flash
 # 40
 ```
 
-Please note that `dumper.fae` is able to **access memory anywhere in both RAM and Flash memory**.
+Please note that `dumper.fae` is able to **access memory anywhere in
+ both RAM and Flash memory**.
 
 - Execute `dumper.fae` with memory protection enabled.
 
-```
+```shell
 > execute -p /nvme0p0/dumper.fae legit-ram
 # execute -p /nvme0p0/dumper.fae legit-ram
 # 20003050  e8 24 00 20 88 66 00 20   00 30 00 20 00 00 00 00  |.$. .f. .0. ....|
@@ -151,13 +163,16 @@ Please note that `dumper.fae` is able to **access memory anywhere in both RAM an
 # Failed to execute '/nvme0p0/dumper.fae', error=-5 (I/O error)
 ```
 
-Please note that `dumper.fae` is **only able to access to its own RAM and Flash memory spaces**.
-**Other attempts** lead to an **illegal memory access**, detected and raised by the board MPU hardware.
+Please note that `dumper.fae` is **only able to access to its own RAM and
+ Flash memory spaces**.
+
+**Other attempts** lead to an **illegal memory access**, detected and raised
+ by the board MPU hardware.
 
 - At last, you can run VFS shell commands on XiPFS mountpoints.
-For example :
+For example:
 
-```
+```shell
 > vfs df
 # vfs df
 # Mountpoint              Total         Used    Available     Use%

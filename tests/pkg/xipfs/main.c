@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2024 Université de Lille
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrightText: 2024-2026 Université de Lille
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 /**
@@ -28,19 +28,7 @@
 
 #include "blob/minimal.fae.h"
 
-/**
- * @def PANIC
- *
- * @brief This macro handles fatal errors
- */
-#define PANIC() for (;;) {}
-
-/**
- * @def NVME0P0_PAGE_NUM
- *
- * @brief The number of flash page for the nvme0p0 file system
- */
-#define NVME0P0_PAGE_NUM 20
+#define NVME0P0_PAGE_NUM 20 /**< The number of flash page for the nvme0p0 file system */
 
 #define XIPFS_ASSERT(condition)       \
 do {                                  \
@@ -50,19 +38,13 @@ do {                                  \
     assert((condition));              \
 } while (0)
 
-/*
- * Allocate a new contiguous space for the nvme0p0 file system
- */
+/* Allocate a new contiguous space for the nvme0p0 file system */
 XIPFS_NEW_PARTITION(nvme0p0, "/dev/nvme0p0", NVME0P0_PAGE_NUM);
 
-/*
- * Get a pointer to an xipfs_mount_t from a vfs_xipfs_mount_t
- */
+/* Get a pointer to an xipfs_mount_t from a vfs_xipfs_mount_t */
 xipfs_mount_t *xipfs_nvme0p0 = NULL;
 
-/*
- * Test function prototypes
- */
+/* Test function prototypes */
 static void test_xipfs_flash_memory(void);
 
 static void test_xipfs_format_invalid_cases(void);
@@ -479,10 +461,7 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     printf("Tests finished.\n");
 }
 
-/*
- * Entry point
- */
-
+/* Entry point */
 int main(void)
 {
     test_xipfs_flash_memory();
@@ -518,9 +497,7 @@ int main(void)
     for (;;) {}
 }
 
-/*
- * Test function implementations
- */
+/* Test function implementations */
 static void test_xipfs_flash_memory(void)
 {
     printf("Flash memory tests started...\n");

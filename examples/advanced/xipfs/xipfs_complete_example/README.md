@@ -1,7 +1,7 @@
-# XiPFS complete example.
+# XiPFS complete example
 
-## About.
-This example demonstrates :
+## About
+This example demonstrates:
 - the allocation on an empty mountpoint in flash memory,
 - the inclusion in flash memory of a pre-made offboard mountpoint image,
 - how to mount these and use them in code.
@@ -9,42 +9,51 @@ This example demonstrates :
 XiPFS should be compatible with ARM 32 bits platforms having an ARMv7-M Memory Protection Unit;
 but for now, only the Qorvo `DWM1001` board has been tested and is confirmed to function correctly.
 
-## FAE files.
-[FAE format](https://github.com/2xs/fae_format/tree/master) is a custom lightweight binary executable format dedicated to the deployment of post-issuance software in constrained devices.
+## FAE files
+[FAE format](https://github.com/2xs/fae_format/tree/master) is a custom
+lightweight binary executable format dedicated to the deployment of
+post-issuance software in constrained devices.
 
-Two FAE files have been crafted and are provided for demonstration purposes :
+Two FAE files have been crafted and are provided for demonstration purposes:
 
-- `pi.fae`, which computes and prints the first digits of Pi.
-Source code is available in the folder [03-main](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/03-pi) of XiPFS demonstrations.
-- `led.fae`, which switches on and off board leds.
-Source code is available in the folder [04-led](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/04-led) of XiPFS demonstrations.
+- `21.fae`, which returns the integer value 21.
+- `dumper.fae`, which attempts to display to standard output memory contents from RAM or flash memory.
+Source code is available in the folder [18-memory_hexdump](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/18-memory_hexdump)
+ of XiPFS demonstrations.
 
-To reproduce these files or to create your own, please start by cloning the `master` branch of [FAE format repository](https://github.com/2xs/fae_format/tree/master).
-Then, read the associated [README.md](https://github.com/2xs/fae_format/blob/master/README.md) and [GETTING_STARTED.md](https://github.com/2xs/fae_format/blob/master/GETTING_STARTED.md) documents
-to setup your build environment.
+To reproduce these files or to create your own, please start by cloning
+the `master` branch of [FAE format repository](https://github.com/2xs/fae_format/tree/master).
 
-Finally, clone the `master` branch of [XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master) and follow the [README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
+Then, read the associated [README.md](https://github.com/2xs/fae_format/blob/master/README.md)
+ and [GETTING_STARTED.md](https://github.com/2xs/fae_format/blob/master/GETTING_STARTED.md)
+ documents to setup your build environment.
 
-## `mkxipfs` tool.
+Finally, clone the `master` branch of [XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master)
+ and follow the [README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
 
-XiPFS offers to create mountpoint memory images offboard, thanks to a provided tool running on workstations, namely `mkxipfs` binary.
+## `mkxipfs` tool
 
-### How to make `mkxipfs` ?
-```
-$ git clone https://github.com/2xs/xipfs.git
-$ make -C xipfs/tools
-$ ls xipfs/tools/bin
+XiPFS offers to create mountpoint memory images offboard, thanks to a provided
+ tool running on workstations, namely `mkxipfs` binary.
+
+### How to make `mkxipfs`
+```shell
+git clone https://github.com/2xs/xipfs.git
+make -C xipfs/tools
+ls xipfs/tools/bin
 mkxipfs
 ```
 
-More information and details can be found in the related XiPFS' [README.md](https://github.com/2xs/xipfs/blob/main/README.md) and [GETTING_STARTED.md](https://github.com/2xs/xipfs/blob/main/GETTING_STARTED.md).
+More information and details can be found in the related XiPFS'
+ [README.md](https://github.com/2xs/xipfs/blob/main/README.md)
+ and [GETTING_STARTED.md](https://github.com/2xs/xipfs/blob/main/GETTING_STARTED.md).
 
-### Building memory images easily.
+### Building memory images easily
 
-Given the following tree structure, crafted beforehand, and residing into the host filesystem :
+Given the following tree structure, crafted beforehand, and residing into the host filesystem:
 
-```
-$ tree /tmp/complete_example/
+```shell
+tree /tmp/complete_example/
 /tmp/complete_example/
 ├── 21.fae
 └── dumper.fae
@@ -52,34 +61,34 @@ $ tree /tmp/complete_example/
 1 directory, 2 files
 ```
 
-Let's build a 16 KiB memory image from this directory, for the `dwm1001` board :
+Let's build a 16 KiB memory image from this directory, for the `dwm1001` board:
 
+```shell
+xipfs/tools/bin/mkxipfs --target dwm1001 build /path_to/RIOT/examples/advanced/xipfs/xipfs_complete_example/nvme0p0.flash /tmp/complete_example 16K
 ```
-$ xipfs/tools/bin/mkxipfs --target dwm1001 build /path_to/RIOT/examples/advanced/xipfs/xipfs_complete_example/nvme0p0.flash /tmp/complete_example 16K
-```
 
-## RIOT example usage.
+## RIOT example usage
 
-The target board is Qorvo's `dwm1001` :
+The target board is Qorvo's `dwm1001`:
 
-- Fire `pyterm` in a terminal.
+- Open e.g. `pyterm` in a terminal with `make term`.
 
-```
-$ cd examples/advanced/xipfs/xipfs_complete_example
-$ BOARD=dwm1001 QUIET=0 make term
+```shell
+cd examples/advanced/xipfs/xipfs_complete_example
+BOARD=dwm1001 QUIET=0 make term
 ```
 
 - Build the example and flash the board in **another terminal**.
 
-```
-$ cd examples/advanced/xipfs/xipfs_complete_example
-$ BOARD=dwm1001 QUIET=0 make flash
+```shell
+cd examples/advanced/xipfs/xipfs_complete_example
+BOARD=dwm1001 QUIET=0 make flash
 ```
 
 - Observe the messages displayed in `pyterm` terminal.
 
-```
-# main(): This is RIOT! (Version: aef79-xipfs_incbin_pr)
+```shell
+# main(): This is RIOT! (Version: ...)
 # vfs_mount: "/nvme0p0": OK
 # vfs_mount: "/nvme0p1": OK
 #
@@ -121,7 +130,7 @@ $ BOARD=dwm1001 QUIET=0 make flash
 ```
 
 - At last, you can then run regular VFS shell commands, as in other XiPFS examples.
-```
+```shell
 > vfs df
 # vfs df
 # Mountpoint              Total         Used    Available     Use%

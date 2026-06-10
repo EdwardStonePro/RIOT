@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2024-2026 Université de Lille
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024-2026 Université de Lille
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 /**
@@ -27,28 +24,14 @@
 #include "shell.h"
 #include "vfs.h"
 
-/**
- * @def NVME0P0_PAGE_NUM
- *
- * @brief The number of flash page for the nvme0p0 file system.
- */
-#define NVME0P0_PAGE_NUM 10
+#define NVME0P0_PAGE_NUM 10 /**< The number of flash pages for the nvme0p0 file system. */
 
-/**
- * @def NVME0P1_PAGE_NUM
- *
- * @brief The number of flash page for the nvme0p1 file system.
- */
-#define NVME0P1_PAGE_NUM 15
+#define NVME0P1_PAGE_NUM 15 /**< The number of flash pages for the nvme0p1 file system. */
 
-/*
- * Allocate a new contiguous space for the nvme0p0 file system.
- */
+/* Allocate a new contiguous space for the nvme0p0 file system. */
 XIPFS_NEW_PARTITION(nvme0p0, "/nvme0p0", NVME0P0_PAGE_NUM);
 
-/*
- * Allocate a new contiguous space for the nvme0p1 file system.
- */
+/* Allocate a new contiguous space for the nvme0p1 file system. */
 XIPFS_NEW_PARTITION(nvme0p1, "/nvme0p1", NVME0P1_PAGE_NUM);
 
 #ifdef BOARD_DWM1001
@@ -94,7 +77,7 @@ static int drop_file(const file_to_drop_t *file_to_drop) {
             file_to_drop->filename, file_to_drop->bytesize, file_to_drop->is_executable
         );
         if (ret < 0) {
-            printf("xipfs_extended_driver_new_file : failed to create '%s' : error=%d\n",
+            printf("xipfs_extended_driver_new_file: failed to create '%s' : error=%d\n",
                    file_to_drop->filename, ret);
             return EXIT_FAILURE;
         }
@@ -105,14 +88,14 @@ static int drop_file(const file_to_drop_t *file_to_drop) {
          */
         file_handle = vfs_open(file_to_drop->filename, O_WRONLY, 0);
         if (file_handle < 0) {
-            printf("vfs_open : failed to open '%s' : error =%d\n",
+            printf("vfs_open: failed to open '%s' : error =%d\n",
                    file_to_drop->filename, file_handle);
             return EXIT_FAILURE;
         }
 
         ssize_t write_ret = vfs_write(file_handle, file_to_drop->data, file_to_drop->bytesize);
         if (write_ret < 0) {
-            printf("vfs_write : failed to fill '%s' : error=%d\n",
+            printf("vfs_write: failed to fill '%s' : error=%d\n",
                    file_to_drop->filename, write_ret);
             vfs_close(file_handle);
             return EXIT_FAILURE;
@@ -124,10 +107,10 @@ static int drop_file(const file_to_drop_t *file_to_drop) {
 }
 
 /**
- * @brief Execution in-place demonstrator.
+ * @brief "Drop files" shell command.
  *
- * This shell command handler will create a file hello-world.fae on /nvme0p0,
- * if none exists yet from the files_to_drop array.
+ * This shell command handler will create hello-world.fae and dumper.fae files
+ * on /nvme0p0, if none exists yet, from the files_to_drop array.
  */
 int drop_files_handler(int argc, char **argv) {
     (void)argc;
@@ -159,8 +142,8 @@ static shell_command_t shell_commands[] = { {NULL, NULL, NULL} };
  * @brief Mount a partition, or if it is corrupted, format and
  * remount it.
  *
- * @param xipfs_mp A pointer to a memory region containing an
- * xipfs mount point structure.
+ * @param[in] xipfs_mp  A pointer to a memory region containing an
+ *                      xipfs mount point structure.
  */
 static void mount_or_format(vfs_xipfs_mount_t *xipfs_mp)
 {

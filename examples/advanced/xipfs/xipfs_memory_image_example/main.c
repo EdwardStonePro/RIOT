@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2024-2026 Université de Lille
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024-2026 Université de Lille
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 /**
@@ -48,8 +45,7 @@ int main(void)
                "initialized or is corrupted\n", nvme0p0.vfs_mp.mount_point);
         for (;;) {}
     }
-    else
-    {
+    else {
         printf("vfs_mount: \"%s\": OK\n", nvme0p0.vfs_mp.mount_point);
     }
 
