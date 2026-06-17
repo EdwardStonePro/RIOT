@@ -50,8 +50,8 @@ static shell_command_t shell_commands[] = { {NULL, NULL, NULL} };
  *
  * @param[in]   mp The mountpoint to initialize.
  *
- * @retval < 0 on errors
- * @retval >= 0 otherwise
+ * @retval <0 on errors
+ * @retval >=0 otherwise
  */
 static int init_mount_point(vfs_xipfs_mount_t *mp)
 {

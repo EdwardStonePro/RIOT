@@ -19,10 +19,12 @@ post-issuance software in constrained devices.
 Two FAE files have been crafted and are provided for demonstration purposes:
 
 - `pi.fae`, which computes and prints the first digits of Pi.
-Source code is available in the folder [03-main](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/03-pi)
- of XiPFS demonstrations.
+Source code is available in the folder
+[03-main](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/03-pi)
+of XiPFS demonstrations.
 - `led.fae`, which switches on and off board leds.
-Source code is available in the folder [04-led](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/04-led)
+Source code is available in the folder
+[04-led](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/04-led)
  of XiPFS demonstrations.
 
 To reproduce these files or to create your own, please start by cloning
@@ -32,8 +34,10 @@ Then, read the associated [README.md](https://github.com/2xs/fae_format/blob/mas
  and [GETTING_STARTED.md](https://github.com/2xs/fae_format/blob/master/GETTING_STARTED.md)
  documents to setup your build environment.
 
-Finally, clone the `master` branch of [XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master)
- and follow the [README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
+Finally, clone the `master` branch of
+[XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master)
+ and follow the
+[README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
 
 ## `mkxipfs` tool
 

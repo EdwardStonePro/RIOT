@@ -172,7 +172,7 @@ int xipfs_construct_from_flashpage(mtd_flashpage_t *flashpage, const char *path,
  * @param[in] size      The file size in bytes.
  * @param[in] exec      0 for regular files, 1 for executable files.
  *
- * @retval Less than 0 on errors.
+ * @retval <0 on errors.
  * @retval 0 on success.
  */
 int xipfs_extended_driver_new_file(const char *full_path, uint32_t size,
@@ -186,7 +186,7 @@ int xipfs_extended_driver_new_file(const char *full_path, uint32_t size,
  *                      Cannot be NULL, argv[0] contains the executable
  *                      filename.
  *
- * @retval < 0 on errors.
+ * @retval <0 on errors.
  * @retval >=0 on success.
  */
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
@@ -202,8 +202,8 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[]);
  *                      Cannot be NULL, argv[0] contains the executable
  *                      filename.
  *
- * @retval < 0 on errors.
- * @retval >= 0 on success.
+ * @retval <0 on errors.
+ * @retval >=0 on success.
  */
 int xipfs_extended_driver_safe_execv(const char *full_path,
                                      char *const argv[]);

@@ -19,11 +19,15 @@ post-issuance software in constrained devices.
 
 Two FAE files have been crafted and are provided for demonstration purposes:
 
-- `hello-world.fae`, which prints the traditional "Hello World!" message and displays the current temperature.
-Source code is available in the folder [01-main](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/01-main)
- of XiPFS demonstrations.
-- `dumper.fae`, which attempts to display to standard output memory contents from RAM or flash memory.
-Source code is available in the folder [18-memory_hexdump](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/18-memory_hexdump)
+- `hello-world.fae`, which prints the traditional "Hello World!" message and
+displays the current temperature.
+Source code is available in the folder
+[01-main](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/01-main)
+of XiPFS demonstrations.
+- `dumper.fae`, which attempts to display to standard output memory contents
+from RAM or flash memory.
+Source code is available in the folder
+[18-memory_hexdump](https://github.com/2xs/riot-xipfs-demonstrations/tree/master/18-memory_hexdump)
  of XiPFS demonstrations.
 
 To reproduce these files or to create your own, please start by cloning
@@ -33,8 +37,10 @@ Then, read the associated [README.md](https://github.com/2xs/fae_format/blob/mas
  and [GETTING_STARTED.md](https://github.com/2xs/fae_format/blob/master/GETTING_STARTED.md)
  documents to setup your build environment.
 
-Finally, clone the `master` branch of [XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master)
- and follow the [README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
+Finally, clone the `master` branch of
+[XiPFS demonstrations repository](https://github.com/2xs/riot-xipfs-demonstrations/tree/master)
+ and follow the
+[README.md file](https://github.com/2xs/riot-xipfs-demonstrations/blob/master/README.md).
 
 ## RIOT example usage
 Given the target board being Qorvo's `dwm1001`:
