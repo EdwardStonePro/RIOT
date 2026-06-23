@@ -697,7 +697,7 @@ static int copy_file(const char *full_path, void *buf, size_t nbyte) {
 }
 
 /*
- * Tagged print argument from riotprintln!/riotfmtln!/print! payloads. Must
+ * Tagged print argument from riotfmtln!/print! payloads. Must
  * match rust-xipfs-lib's `#[repr(C, u32)] PrintArg` (tags follow declaration
  * order: 0=Int, 1=Uint, 2=Str(ptr,len), 3=Hex, 4=Char). Char's codepoint
  * shares the `u` slot of the union.
@@ -768,17 +768,6 @@ static void print_spec(const struct print_arg *a, int zero, int width, char type
         printf(f, (unsigned long)a->v.u);
     }
 #pragma GCC diagnostic pop
-}
-
-/* Positional path: space-separated args, trailing newline. */
-static void sys_print(const struct print_arg *args, size_t len) {
-    for (size_t k = 0; k < len; k++) {
-        if (k) {
-            putchar(' ');
-        }
-        print_one(&args[k]);
-    }
-    putchar('\n');
 }
 
 /* Format path: walk the format string, substitute each `{}`/`{:spec}` with the
@@ -861,7 +850,6 @@ static const void *xipfs_extended_driver_execv_syscalls[XIPFS_SYSCALL_MAX] = {
     [         XIPFS_SYSCALL_VFS_FSYNC] = vfs_fsync,
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
-    [        XIPFS_SYSCALL_SYS_PRINT] = sys_print,
     [    XIPFS_SYSCALL_SYS_PRINT_FMT] = sys_print_fmt,
 };
 
@@ -960,7 +948,6 @@ static const void *xipfs_extended_driver_safe_execv_syscalls[XIPFS_SYSCALL_MAX] 
     [         XIPFS_SYSCALL_VFS_FSYNC] = vfs_fsync,
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
-    [        XIPFS_SYSCALL_SYS_PRINT] = sys_print,
     [    XIPFS_SYSCALL_SYS_PRINT_FMT] = sys_print_fmt,
 };
 

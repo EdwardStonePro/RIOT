@@ -24,7 +24,6 @@ BLOBS += vfs.fae
 BLOBS += xipfs_file_test.fae
 BLOBS += vfs-file-text.fae
 BLOBS += vfs-directory.fae
-BLOBS += vfs-directory-v3.fae
 
 # Modules to include:
 USEMODULE += shell
