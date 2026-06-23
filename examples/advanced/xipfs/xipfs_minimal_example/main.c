@@ -32,7 +32,7 @@
  *
  * @brief The number of flash page for the nvme0p0 file system.
  */
-#define NVME0P0_PAGE_NUM 10
+#define NVME0P0_PAGE_NUM 16
 
 /**
  * @def NVME0P1_PAGE_NUM
@@ -69,6 +69,46 @@ XIPFS_NEW_PARTITION(nvme0p1, "/nvme0p1", NVME0P1_PAGE_NUM);
 #define FILENAME_OF_DUMPER_FAE  "/nvme0p0/dumper.fae"
 #define SIZEOF_DUMPER_FAE       (sizeof(dumper_fae) / sizeof(dumper_fae[0]))
 
+/**
+ * @brief vfs.fae data blob (Rust port of the 20-vfs syscall demo).
+ */
+#include "blob/vfs.fae.h"
+
+#define FILENAME_OF_VFS_FAE  "/nvme0p0/vfs.fae"
+#define SIZEOF_VFS_FAE       (sizeof(vfs_fae) / sizeof(vfs_fae[0]))
+
+/**
+ * @brief xipfs_file_test.fae data blob (Rust File-API test).
+ */
+#include "blob/xipfs_file_test.fae.h"
+
+#define FILENAME_OF_XIPFS_FILE_TEST_FAE  "/nvme0p0/xipfs_file_test.fae"
+#define SIZEOF_XIPFS_FILE_TEST_FAE       (sizeof(xipfs_file_test_fae) / sizeof(xipfs_file_test_fae[0]))
+
+/**
+ * @brief vfs-file-text.fae data blob (Rust VFS File wrapper text demo).
+ */
+#include "blob/vfs-file-text.fae.h"
+
+#define FILENAME_OF_VFS_FILE_TEXT_FAE  "/nvme0p0/vfs-file-text.fae"
+#define SIZEOF_VFS_FILE_TEXT_FAE       (sizeof(vfs_file_text_fae) / sizeof(vfs_file_text_fae[0]))
+
+/**
+ * @brief vfs-directory.fae data blob (Rust VFS mkdir/rename directory demo).
+ */
+#include "blob/vfs-directory.fae.h"
+
+#define FILENAME_OF_VFS_DIRECTORY_FAE  "/nvme0p0/vfs-directory.fae"
+#define SIZEOF_VFS_DIRECTORY_FAE       (sizeof(vfs_directory_fae) / sizeof(vfs_directory_fae[0]))
+
+/**
+ * @brief vfs-directory-v3.fae data blob (riotprintln! / sys_print variant).
+ */
+#include "blob/vfs-directory-v3.fae.h"
+
+#define FILENAME_OF_VFS_DIRECTORY_V3_FAE  "/nvme0p0/vfs-directory-v3.fae"
+#define SIZEOF_VFS_DIRECTORY_V3_FAE       (sizeof(vfs_directory_v3_fae) / sizeof(vfs_directory_v3_fae[0]))
+
 typedef struct {
     const char *filename;
     const int   bytesize;
@@ -76,9 +116,14 @@ typedef struct {
     const bool is_executable;
 } file_to_drop_t;
 
-static const file_to_drop_t files_to_drop[2] = {
+static const file_to_drop_t files_to_drop[7] = {
     {FILENAME_OF_HELLO_WORLD_FAE, SIZEOF_HELLO_WORLD_FAE, hello_world_fae, true },
     {FILENAME_OF_DUMPER_FAE, SIZEOF_DUMPER_FAE, dumper_fae, true },
+    {FILENAME_OF_VFS_FAE, SIZEOF_VFS_FAE, vfs_fae, true },
+    {FILENAME_OF_XIPFS_FILE_TEST_FAE, SIZEOF_XIPFS_FILE_TEST_FAE, xipfs_file_test_fae, true },
+    {FILENAME_OF_VFS_FILE_TEXT_FAE, SIZEOF_VFS_FILE_TEXT_FAE, vfs_file_text_fae, true },
+    {FILENAME_OF_VFS_DIRECTORY_FAE, SIZEOF_VFS_DIRECTORY_FAE, vfs_directory_fae, true },
+    {FILENAME_OF_VFS_DIRECTORY_V3_FAE, SIZEOF_VFS_DIRECTORY_V3_FAE, vfs_directory_v3_fae, true },
 };
 
 static int drop_file(const file_to_drop_t *file_to_drop) {
