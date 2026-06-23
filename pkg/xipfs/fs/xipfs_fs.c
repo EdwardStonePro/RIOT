@@ -696,6 +696,38 @@ static int copy_file(const char *full_path, void *buf, size_t nbyte) {
     return nbyte;
 }
 
+/*
+ * Tagged print argument from `riotprintln!` payloads. Must match
+ * rust-xipfs-lib's `#[repr(C, u32)] PrintArg` (tags follow declaration order:
+ * 0=Int, 1=Uint, 2=Str(ptr,len), 3=Hex).
+ */
+struct print_arg {
+    uint32_t tag;
+    union {
+        int32_t  i;
+        uint32_t u;
+        struct { const char *p; uint32_t len; } s;
+        uint32_t h;
+    } v;
+};
+
+/* Format positional args the payload built on its stack; the payload carries
+ * no formatting code, so the work happens here. */
+static void sys_print(const struct print_arg *args, size_t len) {
+    for (size_t k = 0; k < len; k++) {
+        if (k) {
+            putchar(' ');
+        }
+        switch (args[k].tag) {
+        case 0: printf("%ld",   (long)args[k].v.i);                  break;
+        case 1: printf("%lu",   (unsigned long)args[k].v.u);         break;
+        case 2: printf("%.*s",  (int)args[k].v.s.len, args[k].v.s.p); break;
+        case 3: printf("0x%lx", (unsigned long)args[k].v.h);         break;
+        }
+    }
+    putchar('\n');
+}
+
 /**
  * @brief Regular exec exit function.
  *
@@ -735,6 +767,7 @@ static const void *xipfs_extended_driver_execv_syscalls[XIPFS_SYSCALL_MAX] = {
     [         XIPFS_SYSCALL_VFS_FSYNC] = vfs_fsync,
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
+    [        XIPFS_SYSCALL_SYS_PRINT] = sys_print,
 };
 
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
@@ -832,6 +865,7 @@ static const void *xipfs_extended_driver_safe_execv_syscalls[XIPFS_SYSCALL_MAX] 
     [         XIPFS_SYSCALL_VFS_FSYNC] = vfs_fsync,
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
+    [        XIPFS_SYSCALL_SYS_PRINT] = sys_print,
 };
 
 int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
