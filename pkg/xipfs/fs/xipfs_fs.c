@@ -697,9 +697,10 @@ static int copy_file(const char *full_path, void *buf, size_t nbyte) {
 }
 
 /*
- * Tagged print argument from `riotprintln!` payloads. Must match
- * rust-xipfs-lib's `#[repr(C, u32)] PrintArg` (tags follow declaration order:
- * 0=Int, 1=Uint, 2=Str(ptr,len), 3=Hex).
+ * Tagged print argument from riotprintln!/riotfmtln!/print! payloads. Must
+ * match rust-xipfs-lib's `#[repr(C, u32)] PrintArg` (tags follow declaration
+ * order: 0=Int, 1=Uint, 2=Str(ptr,len), 3=Hex, 4=Char). Char's codepoint
+ * shares the `u` slot of the union.
  */
 struct print_arg {
     uint32_t tag;
@@ -711,21 +712,114 @@ struct print_arg {
     } v;
 };
 
-/* Format positional args the payload built on its stack; the payload carries
- * no formatting code, so the work happens here. */
+/* Default formatting, by tag (used for `{}` and the positional path). */
+static void print_one(const struct print_arg *a) {
+    switch (a->tag) {
+    case 0: printf("%ld",   (long)a->v.i);                   break;
+    case 1: printf("%lu",   (unsigned long)a->v.u);          break;
+    case 2: printf("%.*s",  (int)a->v.s.len, a->v.s.p);      break;
+    case 3: printf("0x%lx", (unsigned long)a->v.h);          break;
+    case 4: putchar((int)(a->v.u & 0xff));                   break;
+    }
+}
+
+/* Apply a parsed format spec ({:0Nx} etc.) to one arg by building a printf
+ * conversion. zero = zero-pad flag, width = field width, type = x/X/o/p/0. */
+static void print_spec(const struct print_arg *a, int zero, int width, char type) {
+    if (type == 0 && width == 0 && !zero) {
+        print_one(a);
+        return;
+    }
+    if (a->tag == 2) {                       /* strings ignore numeric specs */
+        printf("%.*s", (int)a->v.s.len, a->v.s.p);
+        return;
+    }
+    if (type == 'p') {
+        printf("0x%08lx", (unsigned long)a->v.u);
+        return;
+    }
+    char f[12];
+    int k = 0;
+    f[k++] = '%';
+    if (zero) {
+        f[k++] = '0';
+    }
+    if (width >= 10) {
+        f[k++] = (char)('0' + (width / 10) % 10);
+    }
+    if (width > 0) {
+        f[k++] = (char)('0' + width % 10);
+    }
+    f[k++] = 'l';
+    /* `f` is built here, not a literal; that is the whole point of this path. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    if (type == 'x' || type == 'X' || type == 'o') {
+        f[k++] = type;
+        f[k] = 0;
+        printf(f, (unsigned long)(a->tag == 0 ? (unsigned long)a->v.i : a->v.u));
+    } else if (a->tag == 0) {
+        f[k++] = 'd';
+        f[k] = 0;
+        printf(f, (long)a->v.i);
+    } else {
+        f[k++] = 'u';
+        f[k] = 0;
+        printf(f, (unsigned long)a->v.u);
+    }
+#pragma GCC diagnostic pop
+}
+
+/* Positional path: space-separated args, trailing newline. */
 static void sys_print(const struct print_arg *args, size_t len) {
     for (size_t k = 0; k < len; k++) {
         if (k) {
             putchar(' ');
         }
-        switch (args[k].tag) {
-        case 0: printf("%ld",   (long)args[k].v.i);                  break;
-        case 1: printf("%lu",   (unsigned long)args[k].v.u);         break;
-        case 2: printf("%.*s",  (int)args[k].v.s.len, args[k].v.s.p); break;
-        case 3: printf("0x%lx", (unsigned long)args[k].v.h);         break;
-        }
+        print_one(&args[k]);
     }
     putchar('\n');
+}
+
+/* Format path: walk the format string, substitute each `{}`/`{:spec}` with the
+ * next arg. Faithful (no auto-newline); `{{`/`}}` are literal braces. */
+static void sys_print_fmt(const char *fmt, size_t fmt_len,
+                          const struct print_arg *args, size_t nargs) {
+    size_t ai = 0;
+    for (size_t i = 0; i < fmt_len; i++) {
+        char c = fmt[i];
+        if (c == '{') {
+            if (i + 1 < fmt_len && fmt[i + 1] == '{') { putchar('{'); i++; continue; }
+            size_t j = i + 1;
+            if (j < fmt_len && fmt[j] == ':') {
+                j++;
+            }
+            int zero = 0;
+            if (j < fmt_len && fmt[j] == '0') { zero = 1; j++; }
+            int width = 0;
+            while (j < fmt_len && fmt[j] >= '0' && fmt[j] <= '9') {
+                width = width * 10 + (fmt[j] - '0');
+                j++;
+            }
+            char type = 0;
+            if (j < fmt_len && fmt[j] != '}') {
+                type = fmt[j];
+                j++;
+            }
+            while (j < fmt_len && fmt[j] != '}') {
+                j++;
+            }
+            i = j;                            /* loop ++ steps past '}' */
+            if (ai < nargs) {
+                print_spec(&args[ai++], zero, width, type);
+            } else {
+                fputs("{?}", stdout);
+            }
+            continue;
+        }
+        if (c == '}' && i + 1 < fmt_len && fmt[i + 1] == '}') { putchar('}'); i++; continue; }
+        putchar(c);
+    }
 }
 
 /**
@@ -768,6 +862,7 @@ static const void *xipfs_extended_driver_execv_syscalls[XIPFS_SYSCALL_MAX] = {
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
     [        XIPFS_SYSCALL_SYS_PRINT] = sys_print,
+    [    XIPFS_SYSCALL_SYS_PRINT_FMT] = sys_print_fmt,
 };
 
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
@@ -866,6 +961,7 @@ static const void *xipfs_extended_driver_safe_execv_syscalls[XIPFS_SYSCALL_MAX] 
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
     [        XIPFS_SYSCALL_SYS_PRINT] = sys_print,
+    [    XIPFS_SYSCALL_SYS_PRINT_FMT] = sys_print_fmt,
 };
 
 int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
