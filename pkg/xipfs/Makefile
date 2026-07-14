@@ -1,6 +1,6 @@
 PKG_NAME=xipfs
 PKG_URL=git@gitlab-ssh.univ-lille.fr:2xs/pip/xipfs.git
-PKG_VERSION=8087964444ee2765f8b970a25be8276bc014370e
+PKG_VERSION=50314bd11fa52442e4639ee10c8cc90ddb51375e
 PKG_LICENSE=CeCILL-2.1
 
 include $(RIOTBASE)/pkg/pkg.mk
