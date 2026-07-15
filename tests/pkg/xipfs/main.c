@@ -3509,6 +3509,8 @@ static const void *fake_syscalls[XIPFS_SYSCALL_MAX] = {
     [         XIPFS_SYSCALL_VFS_FSYNC] = fake_syscall,
     [         XIPFS_SYSCALL_VFS_FCNTL] = fake_syscall,
     [         XIPFS_SYSCALL_VFS_MKDIR] = fake_syscall,
+    [     XIPFS_SYSCALL_VSNPRINTF] = fake_syscall,
+    [    XIPFS_SYSCALL_SYS_PRINT_FMT] = fake_syscall,
 };
 
 static void

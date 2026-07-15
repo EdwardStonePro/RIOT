@@ -736,6 +736,7 @@ static const void *xipfs_extended_driver_execv_syscalls[XIPFS_SYSCALL_MAX] = {
     [         XIPFS_SYSCALL_VFS_FSYNC] = vfs_fsync,
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
+    [     XIPFS_SYSCALL_VSNPRINTF] = vsnprintf,
     [    XIPFS_SYSCALL_SYS_PRINT_FMT] = xipfs_sys_print_fmt,
 };
 
@@ -834,6 +835,7 @@ static const void *xipfs_extended_driver_safe_execv_syscalls[XIPFS_SYSCALL_MAX] 
     [         XIPFS_SYSCALL_VFS_FSYNC] = vfs_fsync,
     [         XIPFS_SYSCALL_VFS_FCNTL] = vfs_fcntl,
     [         XIPFS_SYSCALL_VFS_MKDIR] = vfs_mkdir,
+    [     XIPFS_SYSCALL_VSNPRINTF] = vsnprintf,
     [    XIPFS_SYSCALL_SYS_PRINT_FMT] = xipfs_sys_print_fmt,
 };
 
